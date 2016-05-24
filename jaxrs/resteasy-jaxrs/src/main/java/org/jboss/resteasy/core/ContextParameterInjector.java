@@ -6,7 +6,6 @@ import org.jboss.resteasy.spi.HttpResponse;
 import org.jboss.resteasy.spi.LoggableFailure;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Providers;
 
@@ -53,14 +52,7 @@ public class ContextParameterInjector implements ValueInjector
          {
             Object delegate = ResteasyProviderFactory.getContextData(type);
             if (delegate == null)
-            {
-               String name = method.getName();
-               if (o instanceof ResourceInfo && ("getResourceMethod".equals(name) || "getResourceClass".equals(name)))
-               {
-                  return null;
-               }
                throw new LoggableFailure(Messages.MESSAGES.unableToFindContextualData(type.getName()));
-            }
             return method.invoke(delegate, objects);
          }
          catch (IllegalAccessException e)

@@ -45,12 +45,11 @@ public abstract class BaseHttpRequest implements HttpRequest
          formParameters = Encode.encode(decodedFormParameters);
          return formParameters;
       }
-      MediaType mt = getHttpHeaders().getMediaType();
-      if (mt.isCompatible(MediaType.valueOf("application/x-www-form-urlencoded")))
+      if (getHttpHeaders().getMediaType().isCompatible(MediaType.valueOf("application/x-www-form-urlencoded")))
       {
          try
          {
-            formParameters = FormUrlEncodedProvider.parseForm(getInputStream(), mt.getParameters().get(MediaType.CHARSET_PARAMETER));
+            formParameters = FormUrlEncodedProvider.parseForm(getInputStream());
          }
          catch (IOException e)
          {

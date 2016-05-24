@@ -511,29 +511,15 @@ public class ResteasyDeployment
          {
             if (GetRestful.isRootResource(obj.getClass()))
             {
-               if (actualResourceClasses.contains(obj.getClass()))
-               {
-                  LogMessages.LOGGER.singletonClassAlreadyDeployed("resource", obj.getClass().getName());
-               }
-               else
-               {
-                  LogMessages.LOGGER.addingSingletonResource(obj.getClass().getName(), config.getClass());
-                  resources.add(obj);
-                  registered = true;
-               }
+               LogMessages.LOGGER.addingSingletonResource(obj.getClass().getName(), config.getClass());
+               resources.add(obj);
+               registered = true;
             }
             else
             {
-               if (actualProviderClasses.contains(obj.getClass()))
-               {
-                  LogMessages.LOGGER.singletonClassAlreadyDeployed("provider", obj.getClass().getName());
-               }
-               else
-               {
-                  LogMessages.LOGGER.addingProviderSingleton(obj.getClass().getName(), config.getClass());
-                  providers.add(obj);
-                  registered = true;
-               }
+               LogMessages.LOGGER.addingProviderSingleton(obj.getClass().getName(), config.getClass());
+               providers.add(obj);
+               registered = true;
             }
          }
       }

@@ -1,9 +1,9 @@
 package org.jboss.resteasy.test.client;
 
+import junit.framework.Assert;
 
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,8 +24,6 @@ import java.lang.reflect.Modifier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.jboss.resteasy.test.TestPortProvider.generateURL;
 
@@ -153,9 +151,10 @@ public class ClientBuilderTest
          client.register(FeatureReturningFalse.class).register(FeatureReturningFalse.class);
          handler.flush();
          String logMsg = out.toString();
-         
+
          Assert.assertNotNull(logMsg);
-         Assert.assertTrue(logMsg.contains("RESTEASY002155"));
+         Assert.assertTrue(logMsg.contains("Provider class"));
+         Assert.assertTrue(logMsg.contains("is already registered."));
       } finally {
          logger.removeHandler(handler);
       }
@@ -179,26 +178,20 @@ public class ClientBuilderTest
       client.register(FeatureReturningFalse.class).register(FeatureReturningFalse.class);
       err.flush();
       String logMsg = baos.toString();
+      System.out.println("logMsg: '" + logMsg + "'");
+
       if (logMsg == null || logMsg.length() == 0)
       {
          System.out.println("Running in travis? Skipping test");
          return;
       }
+
       Assert.assertNotNull(logMsg);
-      Matcher matcher = Pattern.compile("RESTEASY002160").matcher(logMsg);
-      int matchCount = 0;
-      while (matcher.find())
-      {
-         matchCount++;
-      }
-      Assert.assertEquals("Expect 1 warnining messages of Provider instance is already registered", 1, matchCount);
-      matcher = Pattern.compile("RESTEASY002155").matcher(logMsg);
-      matchCount = 0;
-      while (matcher.find())
-      {
-         matchCount++;
-      }
-      Assert.assertEquals("Expect 1 warnining messages of Provider class is already registered", 2, matchCount);
+      Assert.assertTrue(logMsg.contains("Provider instance"));
+      Assert.assertTrue(logMsg.contains("is already registered."));
+      Assert.assertTrue(logMsg.contains("Provider class"));
+      int i = logMsg.indexOf("is already registered") + 1;
+      Assert.assertTrue(logMsg.substring(i).indexOf("is already registered") > -1); 
       Assert.assertEquals(count + 1, client.getConfiguration().getInstances().size());
       client.close();
    }

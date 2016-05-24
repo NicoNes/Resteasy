@@ -58,25 +58,16 @@ public class FormUrlEncodedProvider implements MessageBodyReader<MultivaluedMap>
    {
       if (NoContent.isContentLengthZero(httpHeaders)) return new MultivaluedMapImpl<String, String>();
       boolean encoded = FindAnnotation.findAnnotation(annotations, Encoded.class) != null;
-      String charset = mediaType.getParameters().get(MediaType.CHARSET_PARAMETER);
-      if (charset == null)
-      {
-         charset = "UTF-8";
-      }
-      if (encoded) return parseForm(entityStream, charset);
-      else return Encode.decode(parseForm(entityStream, charset), charset);
+      if (encoded) return parseForm(entityStream);
+      else return Encode.decode(parseForm(entityStream));
    }
 
-   public static MultivaluedMap<String, String> parseForm(InputStream entityStream, String charset)
+   public static MultivaluedMap<String, String> parseForm(InputStream entityStream)
            throws IOException
    {
       char[] buffer = new char[100];
       StringBuffer buf = new StringBuffer();
-      if (charset == null)
-      {
-         charset = "UTF-8";
-      }
-      BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream, charset));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream));
 
       int wasRead = 0;
       do
@@ -130,20 +121,15 @@ public class FormUrlEncodedProvider implements MessageBodyReader<MultivaluedMap>
    public void writeTo(MultivaluedMap data, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException
    {
       MultivaluedMap<String, String> formData = (MultivaluedMap<String, String>)data;
-      String charset = mediaType.getParameters().get(MediaType.CHARSET_PARAMETER);
-      if (charset == null)
-      {
-         charset = "UTF-8";
-      }
       boolean encoded = FindAnnotation.findAnnotation(annotations, Encoded.class) != null;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStreamWriter writer = new OutputStreamWriter(baos, charset);
+      OutputStreamWriter writer = new OutputStreamWriter(baos, "UTF-8");
 
       boolean first = true;
       for (Map.Entry<String, List<String>> entry : formData.entrySet())
       {
          String encodedName = entry.getKey();
-         if (!encoded) encodedName = URLEncoder.encode(entry.getKey(), charset);
+         if (!encoded) encodedName = URLEncoder.encode(entry.getKey(), "UTF-8");
 
          for (String value : entry.getValue())
          {
@@ -151,7 +137,7 @@ public class FormUrlEncodedProvider implements MessageBodyReader<MultivaluedMap>
             else writer.write("&");
             if (!encoded)
             {
-               value = URLEncoder.encode(value, charset);
+               value = URLEncoder.encode(value, "UTF-8");
             }
             writer.write(encodedName);
             writer.write("=");

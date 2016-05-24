@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-@ConstrainedTo(RuntimeType.CLIENT)
+@ConstrainedTo(RuntimeType.SERVER)
 public class ClientContentEncodingAnnotationFeature implements DynamicFeature
 {
    @Override

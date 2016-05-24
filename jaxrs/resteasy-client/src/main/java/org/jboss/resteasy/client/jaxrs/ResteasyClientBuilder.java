@@ -20,7 +20,6 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.client.jaxrs.engines.PassthroughTrustManager;
 import org.jboss.resteasy.client.jaxrs.i18n.Messages;
 import org.jboss.resteasy.client.jaxrs.internal.ClientConfiguration;
-import org.jboss.resteasy.client.jaxrs.internal.LocalResteasyProviderFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
@@ -336,7 +335,7 @@ public class ResteasyClientBuilder extends ClientBuilder
       if (providerFactory == null)
       {
          // create a new one
-         providerFactory = new LocalResteasyProviderFactory(new ResteasyProviderFactory());
+         providerFactory = new ResteasyProviderFactory();
          RegisterBuiltin.register(providerFactory);
       }
       return providerFactory;
@@ -567,7 +566,7 @@ public class ResteasyClientBuilder extends ClientBuilder
    @Override
    public ResteasyClientBuilder withConfig(Configuration config)
    {
-      providerFactory = new LocalResteasyProviderFactory(new ResteasyProviderFactory());
+      providerFactory = new ResteasyProviderFactory();
       providerFactory.setProperties(config.getProperties());
       for (Class clazz : config.getClasses())
       {

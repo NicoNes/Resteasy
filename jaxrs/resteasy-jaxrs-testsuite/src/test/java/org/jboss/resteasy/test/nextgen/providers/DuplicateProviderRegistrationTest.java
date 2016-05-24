@@ -99,6 +99,8 @@ public class DuplicateProviderRegistrationTest
          sb.append((char) c);
          c = is.read();
       }
+      System.out.println("is: " + sb.toString());
+      System.out.println("count: " + countWarnings(sb.toString()));
       Assert.assertEquals(7, countWarnings(sb.toString()));
       process.destroy();
    }
@@ -111,7 +113,7 @@ public class DuplicateProviderRegistrationTest
          WebTarget webTarget = client.target("http://www.changeit.com");
          // MyFeature will be registered third on the same webTarget even if
          // webTarget.getConfiguration().isRegistered(MyFeature.class)==true
-         webTarget.register(MyFeature.class).register(new MyFeature()).register(new MyFeature());
+         webTarget.register(MyFeature.class).register(new MyFeature()).register(new MyFeature()).request().get();
       }
       finally
       {

@@ -22,6 +22,7 @@ package org.jboss.resteasy.test.resource.basic;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -38,6 +39,11 @@ import jakarta.ws.rs.ext.Providers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.resteasy.core.providerfactory.ResteasyProviderFactoryImpl;
+import org.jboss.resteasy.plugins.providers.DefaultTextPlain;
+import org.jboss.resteasy.plugins.providers.StringTextStar;
+import org.jboss.resteasy.plugins.providers.jaxb.JAXBXmlRootElementProvider;
+import org.jboss.resteasy.plugins.providers.jsonb.JsonBindingProvider;
 import org.jboss.resteasy.utils.TestApplication;
 import org.jboss.resteasy.utils.TestUtil;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -89,6 +95,20 @@ public class UndefinedMediaTypeMessageBodyWriterTest {
     }
 
     @Test
+    public void checkGetSupportedMediaTypes() throws Exception {
+        Set<MediaType> expectedMediaTypes = Set.of(MediaType.TEXT_PLAIN_TYPE, MediaType.valueOf("text/json"),
+                MediaType.APPLICATION_JSON_TYPE, MediaType.valueOf("application/*+json"));
+        ResteasyProviderFactoryImpl resteasyProviderFactoryImpl = new ResteasyProviderFactoryImpl();
+        resteasyProviderFactoryImpl.register(DefaultTextPlain.class);
+        resteasyProviderFactoryImpl.register(JsonBindingProvider.class);
+        resteasyProviderFactoryImpl.register(StringTextStar.class);
+        resteasyProviderFactoryImpl.register(JAXBXmlRootElementProvider.class);
+        Set<MediaType> supportedMediaTypes = resteasyProviderFactoryImpl.getSupportedMediaTypes(User.class, User.class, null,
+                MediaType.WILDCARD_TYPE);
+        Assertions.assertEquals(expectedMediaTypes, supportedMediaTypes);
+    }
+
+    @Test
     public void checkNoAcceptResponse() throws Exception {
         try (Response response = client.target(TestUtil.generateUri(uri, "/users")).request().get()) {
             Assertions.assertEquals(200, response.getStatus(), () -> String.format("Response failed with %s: %s",
@@ -103,7 +123,7 @@ public class UndefinedMediaTypeMessageBodyWriterTest {
                 .post(Entity.text(entity))) {
             Assertions.assertEquals(200, response.getStatus(), () -> String.format("Response failed with %s: %s",
                     response.getStatus(), response.readEntity(String.class)));
-            Assertions.assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, response.getMediaType());
+            Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
             Assertions.assertEquals(entity, response.readEntity(String.class));
         }
     }
@@ -115,7 +135,7 @@ public class UndefinedMediaTypeMessageBodyWriterTest {
                 .post(Entity.text(entity))) {
             Assertions.assertEquals(200, response.getStatus(), () -> String.format("Response failed with %s: %s",
                     response.getStatus(), response.readEntity(String.class)));
-            Assertions.assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, response.getMediaType());
+            Assertions.assertEquals(MediaType.APPLICATION_JSON_TYPE, response.getMediaType());
             Assertions.assertEquals(entity, response.readEntity(String.class));
         }
     }
